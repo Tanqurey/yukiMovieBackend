@@ -2,6 +2,9 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 let ObjectId = Schema.Types.ObjectId
 const bcrypt = require('bcrypt')
+const {
+  defaultWhatsUp
+} = require('../../config/config')
 
 //加盐位数
 const SALT_WORK_FACTOR = 10
@@ -19,11 +22,11 @@ const userSchema = new Schema({
     type: String
   },
   createTime: {
-    type: Date,
+    type: String,
     default: Date.now()
   },
   lastLoginTime: {
-    type: Date,
+    type: String,
     default: Date.now()
   },
   secureQuestion: {
@@ -31,6 +34,30 @@ const userSchema = new Schema({
   },
   secureAnswer: {
     type: String
+  },
+  whatsUp: {
+    type: String,
+    default: defaultWhatsUp
+  },
+  exp: {
+    type: Number,
+    default: 0
+  },
+  level: {
+    type: Number,
+    default: 0
+  },
+  fansCount: {
+    type: Number,
+    default: 0
+  },
+  subscribeCount: {
+    type: Number,
+    default: 0
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -61,9 +88,9 @@ userSchema.pre('save', function (next) {
 
 // 为Schema配置实例方法
 userSchema.methods = {
-  comparePassword: (userInput, password) => {
+  comparePwdOrAns: (userInput, pwdOrAns) => {
     return new Promise((res, rej) => {
-      bcrypt.compare(userInput, password, (err, isMatch) => {
+      bcrypt.compare(userInput, pwdOrAns, (err, isMatch) => {
         if (err) {
           rej(err)
           return
@@ -71,8 +98,15 @@ userSchema.methods = {
         res(isMatch)
       })
     })
-  }
+  },
 }
+
+//封装静态方法
+// userSchema.statics = {
+//   updateUser: (userKey,val) => {
+
+//   }
+// }
 
 //发布模型
 mongoose.model('User', userSchema)
