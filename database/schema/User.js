@@ -22,11 +22,11 @@ const userSchema = new Schema({
     type: String
   },
   createTime: {
-    type: String,
+    type: Number,
     default: Date.now()
   },
   lastLoginTime: {
-    type: String,
+    type: Number,
     default: Date.now()
   },
   secureQuestion: {

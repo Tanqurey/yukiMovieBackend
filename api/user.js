@@ -38,23 +38,28 @@ router.post('/register', async (ctx) => {
   // 用户注册业务逻辑
   const User = mongoose.model('User')
   const Collection = mongoose.model('Collection')
+  const UserComment = mongoose.model('UserComment')
 
   let newUser = new User(ctx.request.body.params)
-  await newUser.save().then(() => {
-    // ctx.body = successBody
-  }).catch(err => {
+  await newUser.save().catch(err => {
     sendFailBody(ctx.body, err)
   })
 
   let newCollection = new Collection({
     collectionOwner: ctx.request.body.params.userName
   })
-  await newCollection.save().then(() => {
+  await newCollection.save().catch(err => {
+    sendFailBody(ctx.body, err)
+  })
+
+  let newUserComment = new UserComment({
+    userName: ctx.request.body.params.userName
+  })
+  await newUserComment.save().then(() => {
     ctx.body = successBody
   }).catch(err => {
     sendFailBody(ctx.body, err)
   })
-
 })
 
 router.post('/login', async (ctx) => {
