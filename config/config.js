@@ -1,10 +1,19 @@
 const REQUEST_SUCCESS_MSG = '请求完成'
 const SERVER_ERR_MSG = '服务器出错:'
 exports.defaultWhatsUp = "这个人很懒，还没有留下个性签名哦~"
+exports.USEFUL_FLAG = 1
+exports.USELESS_FLAG = 0
 
-exports.successBody = {
+const successBody = {
   code: 200,
   msg: REQUEST_SUCCESS_MSG
+}
+
+exports.getSuccessBody = function () {
+  return {
+    code: 200,
+    msg: REQUEST_SUCCESS_MSG
+  }
 }
 
 exports.failBody = {

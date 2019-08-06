@@ -19,8 +19,7 @@ const UserCommentSchema = new Schema({
       type: ObjectId
     },
     createTime: {
-      type: Number,
-      default: Date.now()
+      type: Number
     },
     movieInfo: {
       id: {

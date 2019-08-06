@@ -5,7 +5,7 @@ const SALT_WORK_FACTOR = 10
 const UserInfo = require('../config/UserInfo')
 
 const {
-  successBody,
+  getSuccessBody,
   sendFailBody
 } = require('../config/config')
 
@@ -21,7 +21,7 @@ router.get('/checkName', async (ctx) => {
   await User.findOne({
     userName: userInput
   }).exec().then(res => {
-    let resBody = successBody
+    let resBody = getSuccessBody()
     if (res) {
       resBody.isExisted = true
       ctx.body = resBody
@@ -56,7 +56,7 @@ router.post('/register', async (ctx) => {
     userName: ctx.request.body.params.userName
   })
   await newUserComment.save().then(() => {
-    ctx.body = successBody
+    ctx.body = getSuccessBody()
   }).catch(err => {
     sendFailBody(ctx.body, err)
   })
@@ -79,41 +79,41 @@ router.post('/login', async (ctx) => {
           userName: userName
         }, {
           lastLoginTime: Date.now()
-        }).then(res => {
-          let resBody = successBody
+        }).then(() => {
+          let resBody = getSuccessBody()
           resBody.isMatch = true
           resBody.currentUser = new UserInfo(findRes)
           ctx.body = resBody
         }).catch(err => {
           sendFailBody(ctx.body, err)
         })
-      }
-      //进行密码的比对
-      let tempUser = new User()
-      await tempUser.comparePwdOrAns(password, findRes.password).then(async isMatch => {
-        if (isMatch) {
-          await User.updateOne({
-            userName: userName
-          }, {
-            lastLoginTime: Date.now()
-          }).then(res => {
-            let resBody = successBody
+      } else {
+        let tempUser = new User()
+        await tempUser.comparePwdOrAns(password, findRes.password).then(async isMatch => {
+          if (isMatch) {
+            await User.updateOne({
+              userName: userName
+            }, {
+              lastLoginTime: Date.now()
+            }).then(res => {
+              let resBody = getSuccessBody()
+              resBody.isMatch = isMatch
+              resBody.currentUser = new UserInfo(findRes)
+              ctx.body = resBody
+            }).catch(err => {
+              sendFailBody(ctx.body, err)
+            })
+          } else {
+            let resBody = getSuccessBody()
             resBody.isMatch = isMatch
-            resBody.currentUser = new UserInfo(findRes)
             ctx.body = resBody
-          }).catch(err => {
-            sendFailBody(ctx.body, err)
-          })
-        } else {
-          let resBody = successBody
-          resBody.isMatch = isMatch
-          ctx.body = resBody
-        }
-      }).catch(err => {
-        sendFailBody(ctx.body, err)
-      })
+          }
+        }).catch(err => {
+          sendFailBody(ctx.body, err)
+        })
+      }
     } else {
-      let resBody = successBody
+      let resBody = getSuccessBody()
       resBody.isMatch = false
       if (isQuickLogin) {
         resBody.currentUser = null
@@ -132,7 +132,7 @@ router.get('/secureQuestion', async (ctx) => {
   await User.findOne({
     userName: userInput
   }).exec().then(res => {
-    let resBody = successBody
+    let resBody = getSuccessBody()
     if (res) {
       resBody.isExisted = true
       resBody.secureQuestion = res.secureQuestion
@@ -158,7 +158,7 @@ router.post('/checkAnswer', async (ctx) => {
   }).exec().then(async res => {
     let tempUser = new User()
     await tempUser.comparePwdOrAns(userAnswer, res.secureAnswer).then(isMatch => {
-      let resBody = successBody
+      let resBody = getSuccessBody()
       resBody.isMatch = isMatch
       ctx.body = resBody
     }).catch(err => {
@@ -198,7 +198,7 @@ router.post('/resetPassword', async (ctx) => {
   }, {
     password: newPassword
   }).then(async res => {
-    ctx.body = successBody
+    ctx.body = getSuccessBody()
   }).catch(err => {
     sendFailBody(ctx.body, err)
   })

@@ -16,8 +16,7 @@ const MovieCommentSchema = new Schema({
   },
   commentList: [{
     createTime: {
-      type: Number,
-      default: Date.now()
+      type: Number
     },
     commentTitle: {
       type: String

@@ -47,13 +47,13 @@ const userSchema = new Schema({
     type: Number,
     default: 0
   },
-  fansCount: {
-    type: Number,
-    default: 0
+  fansList: {
+    type: Array,
+    default: []
   },
-  subscribeCount: {
-    type: Number,
-    default: 0
+  subscribeList: {
+    type: Array,
+    default: []
   },
   isAdmin: {
     type: Boolean,

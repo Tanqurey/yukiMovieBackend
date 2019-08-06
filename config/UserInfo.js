@@ -4,16 +4,16 @@ module.exports = class UserInfo {
     whatsUp,
     exp,
     level,
-    fansCount,
-    subscribeCount,
+    fansList,
+    subscribeList,
     isAdmin
   }) {
     this.userName = userName
     this.whatsUp = whatsUp
     this.exp = exp
     this.level = level
-    this.fansCount = fansCount
-    this.subscribeCount = subscribeCount
+    this.fansList = fansList
+    this.subscribeList = subscribeList
     this.isAdmin = isAdmin
   }
 }

@@ -1,7 +1,7 @@
 const Router = require('koa-router')
 const mongoose = require('mongoose')
 const {
-  successBody,
+  getSuccessBody,
   sendFailBody
 } = require('../config/config')
 
@@ -34,12 +34,12 @@ router.post('/add', async (ctx) => {
             collectionList: newRecord
           }
         }).then(res => {
-          ctx.body = successBody
+          ctx.body = getSuccessBody()
         }).catch(err => {
           sendFailBody(ctx.body, err)
         })
       }
-      ctx.body = successBody
+      ctx.body = getSuccessBody()
     }
     sendFailBody(ctx.body, '未找到相应的记录')
   }).catch(err => {
@@ -60,7 +60,7 @@ router.get('/checkCollected', async (ctx) => {
       const flag = collectionList.some(item => {
         return item.id === id
       })
-      let resBody = successBody
+      let resBody = getSuccessBody()
       resBody.isCollected = flag
       ctx.body = resBody
     }
@@ -84,7 +84,7 @@ router.post('/remove', async ctx => {
       collectionCount: -1
     }
   }).then(res => {
-    ctx.body = successBody
+    ctx.body = getSuccessBody()
   }).catch(err => {
     sendFailBody(ctx.body, err)
   })
@@ -106,7 +106,7 @@ router.get('/load', async ctx => {
       } else {
         collectionData = res.collectionList.slice(start, (start + 1) * eachNum)
       }
-      let resBody = successBody
+      let resBody = getSuccessBody()
       resBody.collectionData = collectionData
       resBody.isEnd = isEnd
       ctx.body = resBody

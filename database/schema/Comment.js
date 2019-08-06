@@ -15,8 +15,7 @@ const commentSchema = new Schema({
     }
   },
   createTime: {
-    type: Number,
-    default: Date.now()
+    type: Number
   },
   commentTitle: {
     type: String

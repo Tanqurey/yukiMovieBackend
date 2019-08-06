@@ -1,7 +1,7 @@
 const Router = require('koa-router')
 const mongoose = require('mongoose')
 const {
-  successBody,
+  getSuccessBody,
   sendFailBody
 } = require('../config/config')
 
@@ -19,7 +19,7 @@ router.get('/user', async (ctx) => {
     'fansCount': -1,
     'level': -1
   }).exec().then(res => {
-    let resBody = successBody
+    let resBody = getSuccessBody()
     if (res.length) {
       let searchResult = []
       res.forEach(item => {
