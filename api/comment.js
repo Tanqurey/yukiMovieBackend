@@ -4,7 +4,8 @@ const {
   getSuccessBody,
   sendFailBody,
   USEFUL_FLAG,
-  USELESS_FLAG
+  USELESS_FLAG,
+  ERR_CATE
 } = require('../config/config')
 const {
   compareHot
@@ -199,7 +200,7 @@ router.post('/judge', async ctx => {
         sendFailBody(ctx.body, err)
       })
     } else {
-      sendFailBody(ctx.body, err)
+      sendFailBody(ctx.body, )
     }
   }).catch(err => {
     sendFailBody(ctx.body, err)
@@ -225,7 +226,7 @@ router.post('/judge', async ctx => {
         sendFailBody(ctx.body, err)
       })
     } else {
-      sendFailBody(ctx.body, err)
+      sendFailBody(ctx.body, ERR_CATE)
     }
   }).catch(err => {
     sendFailBody(ctx.body, err)
@@ -250,5 +251,53 @@ router.get('/count', async ctx => {
     sendFailBody(ctx.body, err)
   })
 
+})
+
+router.get('/load/user', async ctx => {
+  const UserComment = mongoose.model('UserComment')
+  await UserComment.findOne({
+    userName: ctx.query.userName
+  }).then(res => {
+    const eachNum = 4
+    const start = (ctx.query.page - 1) * eachNum
+    let isEnd = false
+    let commentData = []
+    let resBody = getSuccessBody()
+    if (res) {
+      let commentList = res.commentList.reverse()
+      if ((start + 1) * eachNum > commentList.length - 1) {
+        commentData = commentList.slice(start)
+        isEnd = true
+      } else {
+        commentData = commentList.slice(start, (start + 1) * eachNum)
+      }
+      resBody.isEnd = isEnd
+    } else {
+      resBody.isEnd = false
+    }
+    resBody.commentData = commentData
+    ctx.body = resBody
+  }).catch(err => {
+    sendFailBody(ctx.body, err)
+  })
+})
+
+router.get('/recommend', async ctx => {
+  const Comment = mongoose.model('Comment')
+  const eachNum = 4
+  let start = (ctx.query.page - 1) * eachNum
+
+  await Comment.find({}).sort({
+    'createTime': -1
+  }).skip(start).limit(eachNum).exec().then(res => {
+    if (res) {
+      let resBody = getSuccessBody()
+      resBody.commentData = res
+      ctx.body = resBody
+    }
+    sendFailBody(ctx.body, ERR_CATE.NOT_FOUND)
+  }).catch(err => {
+    sendFailBody(ctx.body, err)
+  })
 })
 module.exports = router

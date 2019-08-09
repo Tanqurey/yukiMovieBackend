@@ -3,10 +3,14 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const SALT_WORK_FACTOR = 10
 const UserInfo = require('../config/UserInfo')
+const Guest = require('../config/guest')
 
 const {
   getSuccessBody,
-  sendFailBody
+  sendFailBody,
+  ERR_CATE,
+  COUNT_CATE,
+  COUNT_HANDLE
 } = require('../config/config')
 
 let router = new Router()
@@ -204,4 +208,111 @@ router.post('/resetPassword', async (ctx) => {
   })
 })
 
+router.post('/changeCount', async ctx => {
+  const User = mongoose.model('User')
+
+  let params = ctx.request.body.params
+  let user = params.user
+  let guest = params.guest
+  let handle = params.handle
+
+  if (handle === COUNT_HANDLE.add) {
+    await User.updateOne({
+      userName: user
+    }, {
+      $addToSet: {
+        subscribeList: guest
+      }
+    }).catch(err => {
+      sendFailBody(ctx.body, err)
+    })
+
+    await User.updateOne({
+      userName: guest
+    }, {
+      $addToSet: {
+        fansList: user
+      }
+    }).catch(err => {
+      sendFailBody(ctx.body, err)
+    })
+  } else {
+    await User.updateOne({
+      userName: user
+    }, {
+      $pull: {
+        subscribeList: guest
+      }
+    }).catch(err => {
+      sendFailBody(ctx.body, err)
+    })
+
+    await User.updateOne({
+      userName: guest
+    }, {
+      $pull: {
+        fansList: user
+      }
+    }).catch(err => {
+      sendFailBody(ctx.body, err)
+    })
+  }
+
+  let resBody = getSuccessBody()
+  await User.findOne({
+    userName: user
+  }).then(res => {
+    if (res) {
+      resBody.currentUser = new UserInfo(res)
+    }
+    sendFailBody(ctx.body, ERR_CATE.NOT_FOUND)
+  }).catch(err => {
+    sendFailBody(ctx.body, err)
+  })
+
+  await User.findOne({
+    userName: guest
+  }).then(res => {
+    if (res) {
+      resBody.guestData = new Guest(res)
+      ctx.body = resBody
+    }
+    sendFailBody(ctx.body, ERR_CATE.NOT_FOUND)
+  }).catch(err => {
+    sendFailBody(ctx.body, err)
+  })
+
+})
+
+router.get('/count/load', async ctx => {
+  let params = ctx.query
+  const User = mongoose.model('User')
+
+  await User.findOne({
+    userName: params.userName
+  }).then(res => {
+    if (res) {
+      let list = params.cate == COUNT_CATE.fans ? res.fansList : res.subscribeList
+      const eachNum = 14
+      const start = (params.page - 1) * eachNum
+      let isEnd = false
+      let listData = []
+      if (res) {
+        if ((start + 1) * eachNum > list.length - 1) {
+          listData = list.slice(start)
+          isEnd = true
+        } else {
+          listData = list.slice(start, (start + 1) * eachNum)
+        }
+        let resBody = getSuccessBody()
+        resBody.listData = listData
+        resBody.isEnd = isEnd
+        ctx.body = resBody
+      }
+    }
+    sendFailBody(ctx.body, ERR_CATE.NOT_FOUND)
+  }).catch(err => {
+    sendFailBody(ctx.body, err)
+  })
+})
 module.exports = router

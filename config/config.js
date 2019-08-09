@@ -27,3 +27,22 @@ exports.sendFailBody = (ctxBody, err) => {
   resBody.err = err
   ctxBody = resBody
 }
+
+exports.COUNT_HANDLE = {
+  add: 1,
+  remove: -1
+}
+
+exports.ERR_CATE = {
+  NOT_FOUND: 'NOT_FOUND'
+}
+
+exports.COUNT_CATE = {
+  fans: 0,
+  subscribe: 1
+}
+
+exports.COMMENT_CATE = {
+  latest: 0,
+  hottest: 1
+}

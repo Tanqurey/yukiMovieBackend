@@ -2,7 +2,8 @@ const Router = require('koa-router')
 const mongoose = require('mongoose')
 const {
   getSuccessBody,
-  sendFailBody
+  sendFailBody,
+  ERR_CATE,
 } = require('../config/config')
 
 let router = new Router()
@@ -111,7 +112,7 @@ router.get('/load', async ctx => {
       resBody.isEnd = isEnd
       ctx.body = resBody
     }
-    sendFailBody(ctx.body, err)
+    sendFailBody(ctx.body, ERR_CATE.NOT_FOUND)
   }).catch(err => {
     sendFailBody(ctx.body, err)
   })

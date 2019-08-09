@@ -15,8 +15,7 @@ router.get('/user', async (ctx) => {
     userName: {
       $regex: eval(`/${userName}/`)
     }
-  }, 'level lastLoginTime fansCount userName subscribeCount whatsUp isAdmin').sort({
-    'fansCount': -1,
+  }, 'level lastLoginTime fansCount userName subscribeCount whatsUp isAdmin fansList subscribeList').sort({
     'level': -1
   }).exec().then(res => {
     let resBody = getSuccessBody()
