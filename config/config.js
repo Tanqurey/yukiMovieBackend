@@ -46,3 +46,21 @@ exports.COMMENT_CATE = {
   latest: 0,
   hottest: 1
 }
+
+exports.MAX_LEVEL = 7
+exports.levelExp = {
+  LEVEL_0_EXP: 0,
+  LEVEL_1_EXP: 6,
+  LEVEL_2_EXP: 32,
+  LEVEL_3_EXP: 64,
+  LEVEL_4_EXP: 2000,
+  LEVEL_5_EXP: 4800,
+  LEVEL_6_EXP: 12000,
+  LEVEL_7_EXP: 99000
+}
+
+
+exports.activityCate= {
+  DAILY_LOGIN: 0,
+  POST_A_COMMENT: 2
+}

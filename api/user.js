@@ -10,7 +10,9 @@ const {
   sendFailBody,
   ERR_CATE,
   COUNT_CATE,
-  COUNT_HANDLE
+  COUNT_HANDLE,
+  levelExp,
+  MAX_LEVEL
 } = require('../config/config')
 
 let router = new Router()
@@ -72,17 +74,46 @@ router.post('/login', async (ctx) => {
   let password = loginUser.password
   let isQuickLogin = loginUser.isQuickLogin
   const User = mongoose.model('User')
+  const thisLoginTime = Date.now()
 
-  await User.findOne({
+  await User.findOneAndUpdate({
     userName: userName
   }).exec().then(async (findRes) => {
     if (findRes) {
+      if (thisLoginTime - findRes.lastLoginTime >= 86400000) {
+        await User.updateOne({
+          userName: userName
+        }, {
+          $inc: {
+            exp: 1
+          }
+        }, {
+          new: true
+        }).then(res => {
+          let nowLevel = res.level
+          if (nowLevel === MAX_LEVEL) return
+          let nextLevel = nowLevel + 1
+          if (res.exp >= levelExp['LEVEL_' + nextLevel + '_EXP']) {
+            await User.update({
+              userName: userName
+            }, {
+              $inc: {
+                level: 1
+              }
+            }).catch(err => {
+              sendFailBody(ctx.body, err)
+            })
+          }
+        }).catch(err => {
+          sendFailBody(ctx.body, err)
+        })
+      }
       if (isQuickLogin) {
         // 快速登入
         await User.updateOne({
           userName: userName
         }, {
-          lastLoginTime: Date.now()
+          lastLoginTime: thisLoginTime
         }).then(() => {
           let resBody = getSuccessBody()
           resBody.isMatch = true
@@ -314,5 +345,26 @@ router.get('/count/load', async ctx => {
   }).catch(err => {
     sendFailBody(ctx.body, err)
   })
+})
+
+router.post('/modify/whatsup', async ctx => {
+  const User = mongoose.model('User')
+  let userName = ctx.request.body.params.userName
+  let whatsUp = ctx.request.body.params.whatsUp
+
+  await User.findOneAndUpdate({
+    userName: userName
+  }, {
+    whatsUp: whatsUp
+  }, {
+    new: true
+  }).then(res => {
+    let resBody = getSuccessBody()
+    resBody.currentUser = new UserInfo(res)
+    ctx.body = resBody
+  }).catch(err => {
+    sendFailBody(ctx.body, err)
+  })
+
 })
 module.exports = router
