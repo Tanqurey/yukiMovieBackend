@@ -89,7 +89,7 @@ router.post('/login', async (ctx) => {
           }
         }, {
           new: true
-        }).then(res => {
+        }).then(async res => {
           let nowLevel = res.level
           if (nowLevel === MAX_LEVEL) return
           let nextLevel = nowLevel + 1
@@ -105,7 +105,7 @@ router.post('/login', async (ctx) => {
             })
           }
         }).catch(err => {
-          sendFailBody(ctx.body, err)
+          sendFailBody(ctx.bogdy, err)
         })
       }
       if (isQuickLogin) {
